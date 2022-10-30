@@ -10,7 +10,7 @@ private:
 	BigDecimalInt wholePart; // the left of the decimal point
 	BigDecimalInt fractionPart; // the right of the decimal point
 public:
-	//first group
+	//first group (Zeyad's Part)
 	BigReal (double realNumber = 0.0); // Default constructor
 	BigReal (string realNumber);
 	BigReal (BigDecimalInt bigInteger);
@@ -19,10 +19,10 @@ public:
 	BigReal& operator= (BigReal& other); // Assignment operator
 	BigReal& operator= (BigReal&& other); // Move assignment 
 
-	//second group
+	//second group (Mohamed's Part)
 	BigReal operator+ (BigReal& other);
 	BigReal operator- (BigReal& other);
-	//third group
+	//third group (Abdul-rahman's Part)
 	bool operator< (BigReal anotherReal); 
 	bool operator> (BigReal anotherReal); 
 	bool operator== (BigReal anotherReal); 

@@ -2,7 +2,10 @@
 
 using namespace std;
 
-//first group
+
+
+//first group (Zeyad's Part)
+
 
 BigReal::BigReal(double realNumber = 0.0)
 {
@@ -35,7 +38,8 @@ BigReal& BigReal::operator= (BigReal&& other)
 
 }
 
-//second group
+//second group (Mohamed's Part)
+
 BigReal& BigReal::operator+ (BigReal& other)
 {
 
@@ -44,7 +48,7 @@ BigReal& BigReal::operator- (BigReal& other)
 {
 
 }
-//third group
+//third group (Abdul-rahman's Part)
 bool BigReal::operator< (BigReal anotherReal)
 {
 
