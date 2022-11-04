@@ -5,8 +5,8 @@ using namespace std;
 
 class BigReal {
 private:
-	int sign;
-	int size;
+	char m_sign;
+	int m_size; // represents the sum of wholePart.size() + fractionPart.size()
 	BigDecimalInt wholePart; // the left of the decimal point
 	BigDecimalInt fractionPart; // the right of the decimal point
 public:
@@ -28,6 +28,7 @@ public:
 	bool operator== (BigReal anotherReal); 
 	int size(); 
 	int sign();
-	friend ostream& operator << (ostream& out, BigReal num);
-	friend istream& operator >> (istream& out, BigReal num);
+	friend ostream& operator << (ostream& out, const BigReal& num);
+	friend istream& operator >> (istream& out, const BigReal& num);
+	string str();
 };
