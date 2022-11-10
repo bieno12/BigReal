@@ -36,10 +36,16 @@ public:
     int size();
     int sign();
     void setNumber(string num);
-    string getNumber(){
+        string getNumber() {
         return number;
     }
-
+    char getsign() {
+        return signNumber;
+    }
+    void set_sign(char n)
+    {
+        signNumber = n;
+    }
     BigDecimalInt(){}
     BigDecimalInt(string num)
     {

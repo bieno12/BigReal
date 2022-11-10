@@ -21,6 +21,7 @@ BigReal::BigReal(string realNumber)
 
 	string numstr = matches[2].str();
 	this->wholePart.setNumber(numstr);
+
 	string temp = matches[1];
 
 	if(count(all(temp), '-') % 2 )
@@ -29,10 +30,18 @@ BigReal::BigReal(string realNumber)
 		this->m_sign = '+';
 
 
-	if(matches.size() > 3)
-		this->fractionPart = BigDecimalInt(matches[3].str());
+
+	temp = matches[3].str();
+	while(temp.size() != 0 && temp.back() == '0')
+		temp.pop_back();
+	if(temp.size() != 0)
+	{
+		this->fractionPart = BigDecimalInt(temp);
+	}
 	else
-		this->fractionPart = BigDecimalInt(0);
+	{
+		this->fractionPart = BigDecimalInt("0");
+	}
 
 	this->m_size = wholePart.size() + fractionPart.size();
 
@@ -82,42 +91,175 @@ BigReal& BigReal::operator= (BigReal&& other)
 
 BigReal BigReal::operator+ (BigReal& other)
 {
+    string num1 = fractionPart.getNumber(), num2 = other.fractionPart.getNumber();
+    char sign1 = fractionPart.getsign(), sign2 = other.fractionPart.getsign();
+    BigReal result;
+    while (num1.size() < num2.size()) {
+        num1 += '0';
+    }
+    while (num2.size() < num1.size()) {
+        num2 += '0';
+    }
+    fractionPart.setNumber(num1);
+    other.fractionPart.setNumber(num2);
+    fractionPart.set_sign(sign1);
+    other.fractionPart.set_sign(sign2);
+    BigDecimalInt sumwhole = wholePart + other.wholePart;
+    BigDecimalInt sumfrac = fractionPart + other.fractionPart;
 
-	return other;
+    BigReal x = *this;
+    if (m_sign == '-' && other.m_sign == '+') {
+        x.fractionPart.set_sign('+');
+        x.wholePart.set_sign('+');
+        if ((x.fractionPart < other.fractionPart && x.wholePart > other.wholePart) || (x.fractionPart > other.fractionPart && x.wholePart < other.wholePart)) {
+            int count = 1;
+            for (int i = 0; i < fractionPart.size(); ++i) count *= 10;
+            BigDecimalInt v(to_string(count)), vv("1");
+            sumfrac.set_sign('+');
+            sumfrac = v - sumfrac;
+            if (sumwhole.sign() == 1) sumwhole = sumwhole - vv;
+            else if (sumwhole.sign() == 0) sumwhole = sumwhole + vv;
+        }
+    }
+    else if (m_sign == '+' && other.m_sign == '-') {
+        x = other;
+        x.fractionPart.set_sign('+');
+        x.wholePart.set_sign('+');
+
+
+        if ((x.fractionPart < fractionPart && x.wholePart > wholePart) || (x.fractionPart > fractionPart && x.wholePart < wholePart)) {
+            int count = 1;
+            for (int i = 0; i < fractionPart.size(); ++i) count *= 10;
+            BigDecimalInt v(to_string(count)), vv("1");
+            sumfrac.set_sign('+');
+            sumfrac = v - sumfrac;
+            if (sumwhole.sign() == 1) sumwhole = sumwhole - vv;
+            else if (sumwhole.sign() == 0) sumwhole = sumwhole + vv;
+        }
+    }
+
+    else if (m_sign == other.m_sign) {
+        if (sumfrac.size() != fractionPart.size())
+        {
+            BigDecimalInt zz("1");
+            string xx = result.fractionPart.getNumber();
+            xx.erase(0, 1);
+            sumfrac.setNumber(xx);
+            sumwhole = sumwhole + zz;
+        }
+
+    }
+    result.fractionPart = sumfrac;
+    result.wholePart = sumwhole;
+    result.wholePart.set_sign(sumwhole.getsign());
+    result.m_sign = result.wholePart.getsign();
+
+    return result;
 }
+
 BigReal BigReal::operator- (BigReal& other)
 {
+    
+    BigReal x, result, c =*this;
+    
+    if(other.m_sign == '-')
+    {   
+        x = other;
+        x.fractionPart.set_sign('+');
+        x.wholePart.set_sign('+');
+        result = x + c;
+    }
 
-	return other;
+    else
+    {
+        if(other.m_sign == '+')
+        {
+            x = other;
+            x.fractionPart.set_sign('-');
+            x.wholePart.set_sign('-');
+            result = x + c;
+        }
+    }
+
+    return result;
 }
 //third group (Abdul-rahman's Part)
 bool BigReal::operator< (BigReal anotherReal)
 {
-	return 1;
+    string num = wholePart.getNumber();
+    string num2 = anotherReal.wholePart.getNumber();
+
+    if (num[0] != num2[0] && num[0] == '-') return true; //false
+    else if (num[0] != num2[0] && num2[0] == '-') return false; //true
+   
+    else {
+        if (wholePart < anotherReal.wholePart) return true; //false
+        else if (wholePart > anotherReal.wholePart) return false; //true
+        
+        else {
+            if (fractionPart < anotherReal.fractionPart) return true; //true
+            else return false;
+        }
+    }
+    
 }
 bool BigReal::operator> (BigReal anotherReal)
-{
-	return 1;
+{    
+    string num = wholePart.getNumber();
+    string num2 = anotherReal.wholePart.getNumber();
+
+    if (num[0] != num2[0] && num[0] == '-') return false; //false
+    else if (num[0] != num2[0] && num2[0] == '-') return true; //true
+
+    else {
+        if (wholePart < anotherReal.wholePart) return false; //false
+        else if (wholePart > anotherReal.wholePart) return true; //true
+
+        else {
+            if (fractionPart > anotherReal.fractionPart) return true; //true
+            else return false;
+        }
+    }
 }
 bool BigReal::operator== (BigReal anotherReal)
 {
-	return 1;
+    string s2, s1 = wholePart.getNumber();
+    s1 += fractionPart.getNumber();
+
+    s2 = anotherReal.wholePart.getNumber();
+    s2 += anotherReal.fractionPart.getNumber();
+
+    if (m_sign != anotherReal.m_sign) return false;
+    else {
+        if (s1 == s2) return true;
+        else return false;
+    }
 }
 int BigReal::size()
 {
-	return 1;
+    cout << "this length without the sign and (.)" << endl;
+    string s1 = wholePart.getNumber();
+    s1 += fractionPart.getNumber();
+    return s1.size();
 }
 int BigReal::sign()
 {
-	return 1;
+    if (m_sign == '+') return 1;
+    else return 0;
 }
 ostream& operator << (ostream& out, const BigReal& num)
 {
-	return out;
+    BigReal x = num;
+    
+    out << x.str();
+    return out;
 }
-istream& operator >> (istream& out, const BigReal& num)
+istream& operator >> (istream& in, BigReal& num)
 {
-	return out;
+    string num_str;
+    in >> num_str;
+    num = BigReal(num_str);
+    return in;
 }
 
 //additional functions
